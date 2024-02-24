@@ -16,8 +16,77 @@ class TimeBlockTest {
     TimeBlock block = new TimeBlock();
 
     @Test
+    public void testEntirelyBefore() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(9, 0), LocalTime.of(10, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(11, 0), LocalTime.of(12, 0));
+        assertFalse(block1.isOverlapping(block2));
+    }
+
+    @Test
+    public void testEntirelyAfter() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(13, 0), LocalTime.of(14, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(11, 0), LocalTime.of(12, 0));
+        assertFalse(block1.isOverlapping(block2));
+    }
+
+    @Test
+    public void testJustAfter() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(12, 0), LocalTime.of(14, 0));
+        assertFalse(block1.isOverlapping(block2)); // these are not considered to be overlapping
+    }
+
+    @Test
+    public void testJustBefore() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(12, 0), LocalTime.of(14, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        assertFalse(block1.isOverlapping(block2)); // these are not considered to be overlapping
+    }
+
+    @Test
+    public void testStartsBeforeAndEndsAfter() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(13, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(11, 0), LocalTime.of(12, 0));
+        assertTrue(block1.isOverlapping(block2));
+    }
+
+    @Test
+    public void testStartsAfterAndEndsBefore() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(11, 0), LocalTime.of(12, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(13, 0));
+        assertTrue(block1.isOverlapping(block2));
+    }
+
+    @Test
+    public void testSameStartEndsBefore() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(11, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        assertTrue(block1.isOverlapping(block2));
+    }
+
+    @Test
+    public void testSameStartEndsAfter() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(13, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        assertTrue(block1.isOverlapping(block2));
+    }
+
+    @Test
+    public void testStartsBeforeAndOverlapsEndsSameTime() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(9, 0), LocalTime.of(11, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(11, 0));
+        assertTrue(block1.isOverlapping(block2));
+    }
+
+    @Test
+    public void testStartsSameOrAfterAndOverlapsEndsSameTime() {
+        TimeBlock block1 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        TimeBlock block2 = new TimeBlock(LocalTime.of(10, 0), LocalTime.of(12, 0));
+        assertTrue(block1.isOverlapping(block2));
+    }
+
+    @Test
     void TestSetStartingBound() {
-        assertEquals(this.block.getStartingBound(), LocalTime.MIN);
 
         this.block.setStartingBound(LocalTime.of(12, 0, 0));
 
@@ -53,6 +122,14 @@ class TimeBlockTest {
                                                         // starting bound.
 
         assertEquals(this.block.getEndingBound(), LocalTime.of(11, 0));
+    }
+
+    @Test
+    void testSpecificInBounds() {
+        this.block.setStartingBound(LocalTime.of(10, 0));
+        this.block.setEndingBound(LocalTime.of(12, 0));
+
+        assertFalse(this.block.isInBounds(LocalTime.of(12, 30)));
     }
 
     @ParameterizedTest

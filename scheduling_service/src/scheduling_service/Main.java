@@ -17,6 +17,10 @@ public class Main {
        
        System.out.println(endingBound.compareTo(startingBound)); // should be 1?
        
+       System.out.println(new TimeBlock(LocalTime.of(10, 0), LocalTime.of(12, 0)).hashCode());
+       
+       System.out.println(new TimeBlock(LocalTime.of(12, 0), LocalTime.of(14, 0)).hashCode());
+
     }
 
 }
